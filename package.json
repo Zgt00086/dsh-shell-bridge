@@ -1,6 +1,6 @@
 {
   "name": "local-shizuku-bridge",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "author": "Dainric",
   "type": "module",
