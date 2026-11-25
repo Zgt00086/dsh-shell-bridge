@@ -1,0 +1,41 @@
+{
+  "name": "local-shizuku-bridge",
+  "version": "0.6.0",
+  "private": true,
+  "author": "Dainric",
+  "type": "module",
+  "main": "lib/index.js",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+  },
+  "dshGo": {
+    "v": 1,
+    "title": {
+      "zh": "Shell 桥",
+      "en": "Shell bridge"
+    },
+    "icon": "terminal",
+    "contributes": {
+      "panels": [
+        {
+          "id": "shell-panel",
+          "title": {
+            "zh": "Shell 桥",
+            "en": "Shell bridge"
+          },
+          "icon": "terminal",
+          "placement": [
+            "features",
+            "chat.panel"
+          ],
+          "presentation": "sheet"
+        }
+      ]
+    }
+  }
+}

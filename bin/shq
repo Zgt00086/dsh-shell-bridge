@@ -1,0 +1,26 @@
+#!/bin/bash
+# shq：把一条 Android sh 命令交给 Shizuku 守护（uid 2000）。没有用户授权就拒绝。
+Q=${SHQ_DIR:-/sdcard/Download/DSH-Go/shq}
+mkdir -p "$Q/in" "$Q/out" "$Q/status" 2>/dev/null
+mode=$(cat "$Q/status/mode" 2>/dev/null) || true
+[ -n "$mode" ] || { echo "shq: 未授权（守护没在跑）" >&2; exit 126; }
+exp=$(printf '%s' "$mode" | cut -d' ' -f2)
+now=$(date +%s)
+[ "${exp:-0}" -gt "$now" ] 2>/dev/null || { echo "shq: 授权已过期" >&2; exit 126; }
+alive=$(cat "$Q/status/alive" 2>/dev/null || echo 0)
+[ $((now - alive)) -le 15 ] || { echo "shq: 守护没有心跳" >&2; exit 126; }
+id="req-$(date +%s%N)-$RANDOM"
+printf '%s\n' "$@" > "$Q/in/.$id.tmp" || exit 1
+mv "$Q/in/.$id.tmp" "$Q/in/$id.sh" || exit 1
+for _ in $(seq 1 "${SHQ_WAIT:-1500}"); do
+  if [ -f "$Q/status/$id.code" ]; then
+    cat "$Q/out/$id.out" 2>/dev/null
+    code=$(cat "$Q/status/$id.code" 2>/dev/null)
+    rm -f "$Q/out/$id.out" "$Q/status/$id.code"
+    exit "${code:-0}"
+  fi
+  sleep 0.2
+done
+rm -f "$Q/in/$id.sh"
+echo "shq: 等到超时（守护可能在跑长命令或已退出）" >&2
+exit 124
